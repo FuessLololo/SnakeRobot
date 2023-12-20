@@ -1,0 +1,37 @@
+import pybullet as p
+import time
+import pybullet_data
+
+# connect to pybullet
+physicsCilent = p.connect(p.GUI) #GUI/DIRECT
+
+# add search path for loadURDF
+p.setAdditionalSearchPath(pybullet_data.getDataPath())
+
+# set environment gravity
+p.setGravity(0, 0, -9.8)
+
+# load plane.urdf, blue-and-white plane
+planeId = p.loadURDF("plane.urdf")
+
+# load the robot and its start position 
+startPos = [0, 0, 1]
+startOrientation = p.getQuaternionFromEuler([0, 0, 0])
+boxId = p.loadURDF("r2d2.urdf", startPos, startOrientation)
+
+# Accoring to the position and orientation, reset the robot. Since we have already initialized the robot, it doesn't matter whether we add this sentence or not.
+p.resetBasePositionAndOrientation(boxId, startPos, startOrientation)
+
+# Iterize for 1000 times, and pause for 1/240 after each interaction
+for i in range(1000):
+    p.stepSimulation()
+    time.sleep(1 / 240)
+
+# Aquire position and orientation quaternion
+cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId)
+print("-" * 20)
+print(f"机器人的位置坐标为:{cubePos}\n机器人的朝向四元数为:{cubeOrn}")
+print("-" * 20)
+
+# Disconnect pybullet
+p.disconnect()

@@ -62,8 +62,9 @@ n_steps = 60000
 
 ### load all the objects into the environment
 # load the ground plane
+playing_ball_path = os.path.dirname(__file__)
 planeId = p.loadURDF(
-    "additional_urdfs/plane/plane.urdf", flags=p.URDF_USE_MATERIAL_COLORS_FROM_MTL
+    playing_ball_path + "/additional_urdfs/plane/plane.urdf", flags=p.URDF_USE_MATERIAL_COLORS_FROM_MTL
 )
 p.changeDynamics(planeId, -1, lateralFriction=1)  # set ground plane friction
 
@@ -71,7 +72,7 @@ p.changeDynamics(planeId, -1, lateralFriction=1)  # set ground plane friction
 hoopStartPos = [-3.6, 0, 1]
 hoopStartOr = p.getQuaternionFromEuler([0, 0, 0])
 hoopId = p.loadURDF(
-    "additional_urdfs/bball_court/hoop.urdf",
+    playing_ball_path + "/additional_urdfs/bball_court/hoop.urdf",
     hoopStartPos,
     hoopStartOr,
     flags=p.URDF_USE_MATERIAL_COLORS_FROM_MTL,
@@ -83,7 +84,7 @@ hoopId = p.loadURDF(
 ballStartPos = [3.5, 0.75, 0.5]
 ballStartOr = p.getQuaternionFromEuler([0, 0, 0])
 ballId = p.loadURDF(
-    "additional_urdfs/bball_court/ball.urdf",
+    playing_ball_path + "/additional_urdfs/bball_court/ball.urdf",
     ballStartPos,
     ballStartOr,
     flags=p.URDF_USE_MATERIAL_COLORS_FROM_MTL,
@@ -93,7 +94,7 @@ p.changeDynamics(ballId, -1, lateralFriction=1)  # set ball friction
 
 ### Create and load the manipulator / arm
 # load the manipulator definition
-arm_manipulator_def = SMManipulatorDefinition.from_file("definitions/bb_arm.yaml")
+arm_manipulator_def = SMManipulatorDefinition.from_file(playing_ball_path + "/definitions/bb_arm.yaml")
 
 # create the arm manipulator...
 arm = SMContinuumManipulator(arm_manipulator_def)
@@ -118,7 +119,7 @@ arm.set_contact_property(contact_properties)
 ######## PRESCRIBE A TRAJECTORY ########
 # here, the trajectory is hard-coded (booh!) and prepared using the sorotraj format
 traj = sorotraj.TrajBuilder(graph=False)
-traj.load_traj_def("trajectory")
+traj.load_traj_def(playing_ball_path + "/trajectory.yaml")
 trajectory = traj.get_trajectory()
 interp = sorotraj.Interpolator(trajectory)
 actuation_fn = interp.get_interp_function(

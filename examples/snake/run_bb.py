@@ -11,7 +11,7 @@ import sys
 path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..")
 )  # this is a bit hacky... just in case the user doesnt have somo installed...
-sys.path.insert(0, path)
+# sys.path.insert(0, path)
 
 from somo.sm_manipulator_definition import SMManipulatorDefinition
 from somo.sm_actuator_definition import SMActuatorDefinition
@@ -44,10 +44,13 @@ p.setPhysicsEngineParameter(enableFileCaching=0)
 plane = p.createCollisionShape(p.GEOM_PLANE)
 p.createMultiBody(0, plane)
 
-p.configureDebugVisualizer(p.COV_ENABLE_GUI, 1)
+p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)  # disable rendering while loading objects
+p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0) #Enable GUI widgets
+p.configureDebugVisualizer(p.COV_ENABLE_TINY_RENDERER, 0) #disable TinyRenderer
 
 # Set the camera position. This goes right after you instantiate the GUI:
-cam_distance, cam_yaw, cam_pitch, cam_xyz_target = 3, -30.0, -30, [0.0, 0.0, 0.0]
+# cam_distance, cam_yaw, cam_pitch, cam_xyz_target = 3, -30.0, -30, [0.0, 0.0, 0.0]
+cam_distance, cam_yaw, cam_pitch, cam_xyz_target = 3, -30, -89, [0.0, 0.0, 0.0]
 p.resetDebugVisualizerCamera(
     cameraDistance=cam_distance,
     cameraYaw=cam_yaw,
@@ -71,7 +74,9 @@ n_steps = 20000
 
 p.changeDynamics(plane, -1, lateralFriction=1)  # set ground plane friction
 
-arm_manipulator_def = SMManipulatorDefinition.from_file("definitions/bb_snake.yaml")
+snake_yaml = os.path.join(os.path.dirname(__file__), "definitions", "bb_snake.yaml")
+snake_yaml_2 = os.path.join(os.path.dirname(__file__), "definitions", "snake_discrete.yaml")
+arm_manipulator_def = SMManipulatorDefinition.from_file(snake_yaml)
 
 # create the arm manipulator...
 arm = SMContinuumManipulator(arm_manipulator_def)
@@ -87,11 +92,20 @@ arm.load_to_pybullet(
 )
 
 # below is an example of how lateral friction and restitution can be changed for the whole manipulator.
+
+# get the link index of the manipulator. In somo, the robot_id is called bodyUniqueId
+jointsCount = p.getNumJoints(arm.bodyUniqueId)
+for joint_index in range(jointsCount):
+    joint_info = p.getJointInfo(arm.bodyUniqueId, joint_index)
+    link_name = joint_info[12].decode("utf-8")
+    print(f"Link {joint_index}: {link_name}")
+
 contact_properties = {
+    # "bodyUniqueId": arm.bodyUniqueId,
     "lateralFriction": 1,
-    "anisotropicFriction": [10, 0.01, 0.01],
-    "angularDamping": 3
-    # 'restitution': 0.0, # uncomment to change restitution
+    "anisotropicFriction": [12, 0.01, 0.01],
+    "angularDamping": 3,
+    'restitution': 3.0, # uncomment to change restitution
 }
 arm.set_contact_property(contact_properties)
 
@@ -105,8 +119,9 @@ arm.set_contact_property(contact_properties)
 
 ######## PRESCRIBE A TRAJECTORY ########
 # here, the trajectory is hard-coded (booh!) and prepared using the sorotraj format
-traj = sorotraj.TrajBuilder(graph=False)
-traj.load_traj_def("trajectory_loop")
+traj = sorotraj.TrajBuilder(graph=True)
+trajectory_loop = os.path.join(os.path.dirname(__file__), "trajectory.yaml")
+traj.load_traj_def(trajectory_loop)
 trajectory = traj.get_trajectory()
 interp = sorotraj.Interpolator(trajectory)
 actuation_fn = interp.get_interp_function(
@@ -118,12 +133,15 @@ actuation_fn = interp.get_interp_function(
 if VIDEO_LOGGING:
     vid_filename = "~/vid.mp4"
     logIDvideo = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, vid_filename)
+
+p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)  # enable rendering again
+
 for i in range(n_steps):
 
     torques = actuation_fn(
         i * time_step
     )  # retrieve control torques from the trajectory.
-    print(f"i = {i}\t{torques}")
+    # print(f"i = {i}\t{torques}")
     # applying the control torques
     arm.apply_actuation_torques(
         actuator_nrs=[0, 0, 1, 1],
