@@ -62,7 +62,7 @@ actuator_definitions:
     link_definition:
         shape_type: "stadium"
         # dimensions: [ 0.4,0.4,0.075 ]
-        dimensions: [ 0.11,0.12,0.1 ]
+        dimensions: [ 0.12,0.12,0.1 ]
         # mass: 0.00595
         mass: 0.595
         inertial_values: [ 1, 0, 0, 1, 0, 1 ]

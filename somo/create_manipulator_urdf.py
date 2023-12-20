@@ -12,6 +12,9 @@ import numpy as np
 import copy
 import pdb
 
+import inspect
+import os
+
 # TODO: URGENT: error in stadium geometry when using cylinders with uneven dimensions
 
 
@@ -136,6 +139,10 @@ def add_empty_link(robot_root, link_name):
     link = ET.SubElement(robot_root, "link", {"name": link_name})
     return link
 
+# This is for creating the urdf in the same directory as the main program
+def get_main_program_dir():
+    """returns the directory of the uppest level program that called this function"""
+    return os.path.dirname(inspect.stack()[-1][1])
 
 # TODO: add assertion for stadium geometry to require certain height in each element bcs otherwise we get weird behavior
 
@@ -359,6 +366,7 @@ def create_manipulator_urdf(
         urdf_filename = manipulator_definition.manipulator_name + ".urdf"
     tree = ET.ElementTree(robot)
     clean_xml_indentation(robot)
+    urdf_filename = os.path.join(get_main_program_dir(), urdf_filename)
     tree.write(urdf_filename, encoding="utf-8", xml_declaration=True)
 
     return urdf_filename  # xx todo: also return start number of join indexes? do this somewhere
