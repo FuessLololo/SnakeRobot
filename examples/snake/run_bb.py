@@ -101,14 +101,23 @@ for joint_index in range(jointsCount):
     print(f"Link {joint_index}: {link_name}")
 
 contact_properties = {
-    # "bodyUniqueId": arm.bodyUniqueId,
     "lateralFriction": 1,
     "anisotropicFriction": [12, 0.01, 0.01],
     "angularDamping": 3,
     'restitution': 3.0, # uncomment to change restitution
 }
+
 arm.set_contact_property(contact_properties)
 
+# Use linkIndex to specify the link you want to change the contact properties of
+contact_properties = {
+    "lateralFriction": 1,
+    "anisotropicFriction": [0.01, 0.01, 0.01],
+    "angularDamping": 3,
+    'restitution': 3.0, # uncomment to change restitution
+}
+
+arm.set_contact_property_for_link(contact_properties, linkIndex=1)
 
 # anistropicFriction = [1, 0.01, 0.01]
 # p.changeDynamics(sphereUid, -1, lateralFriction=1.39, anisotropicFriction=anistropicFriction)

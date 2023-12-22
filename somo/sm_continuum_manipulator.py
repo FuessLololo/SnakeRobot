@@ -481,6 +481,17 @@ class SMContinuumManipulator:
                 **property_dict,
             )
 
+    def set_contact_property_for_link(self, property_dict, link_index: int, linkNum = 1):
+        # todo: assert that dict only has valid keys
+        # todo: assert the link_index is valid
+        for _ in range(linkNum):
+            p.changeDynamics(
+                self.bodyUniqueId,
+                link_index,
+                **property_dict,
+            )
+            link_index += 1
+
     def get_backbone_position(self, s):
 
         # todo: does not work properly yet if s = manipulator_length (related to need to making this more precise)
