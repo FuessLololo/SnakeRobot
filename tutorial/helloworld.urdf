@@ -1,37 +1,87 @@
-import pybullet as p
-import time
-import pybullet_data
+<?xml version="1.0"?>
 
-# connect to pybullet
-physicsCilent = p.connect(p.GUI) #GUI/DIRECT
+<robot name="snake_robot">
 
-# add search path for loadURDF
-p.setAdditionalSearchPath(pybullet_data.getDataPath())
+  <!-- Define the material for the visual representation -->
+  <material name="snake_material">
+    <color rgba="0.5 0.5 0.5 1"/>
+  </material>
 
-# set environment gravity
-p.setGravity(0, 0, -9.8)
+  <!-- Link 1 -->
+  <link name="link1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Replace this with the actual geometry information -->
+        <box size="1 1 1"/>
+      </geometry>
+      <material name="snake_material"/>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <!-- Replace this with the actual collision geometry information -->
+        <box size="1 1 1"/>
+      </geometry>
+    </collision>
+    <!-- Physical properties for link1 -->
+    <inertial>
+      <mass value="1.0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <inertia ixx="0.1" ixy="0.0" ixz="0.0" iyy="0.1" iyz="0.0" izz="0.1"/>
+    </inertial>
+  </link>
 
-# load plane.urdf, blue-and-white plane
-planeId = p.loadURDF("plane.urdf")
+  <!-- Additional links... -->
 
-# load the robot and its start position 
-startPos = [0, 0, 1]
-startOrientation = p.getQuaternionFromEuler([0, 0, 0])
-boxId = p.loadURDF("r2d2.urdf", startPos, startOrientation)
+  <!-- Joint connecting links -->
+  <joint name="joint1" type="revolute">
+    <parent link="link1"/>
+    <child link="link2"/>
+    <origin xyz="1 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1416" upper="3.1416"/>
+    <dynamics damping="0.1"/>
+  </joint>
 
-# Accoring to the position and orientation, reset the robot. Since we have already initialized the robot, it doesn't matter whether we add this sentence or not.
-p.resetBasePositionAndOrientation(boxId, startPos, startOrientation)
+  <!-- Additional joints... -->
 
-# Iterize for 1000 times, and pause for 1/240 after each interaction
-for i in range(1000):
-    p.stepSimulation()
-    time.sleep(1 / 240)
+  <!-- Row 2 -->
 
-# Aquire position and orientation quaternion
-cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId)
-print("-" * 20)
-print(f"机器人的位置坐标为:{cubePos}\n机器人的朝向四元数为:{cubeOrn}")
-print("-" * 20)
+  <!-- Link 3 -->
+  <link name="link3">
+    <!-- ... (similar to link1) ... -->
+  </link>
 
-# Disconnect pybullet
-p.disconnect()
+  <!-- Joint connecting links -->
+  <joint name="joint2" type="revolute">
+    <parent link="link2"/>
+    <child link="link3"/>
+    <origin xyz="1 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1416" upper="3.1416"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <!-- Additional joints... -->
+
+  <!-- Row 3 -->
+
+  <!-- Link 4 -->
+  <link name="link4">
+    <!-- ... (similar to link1) ... -->
+  </link>
+
+  <!-- Joint connecting links -->
+  <joint name="joint3" type="revolute">
+    <parent link="link3"/>
+    <child link="link4"/>
+    <origin xyz="1 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.1416" upper="3.1416"/>
+    <dynamics damping="0.1"/>
+  </joint>
+
+  <!-- Additional joints... -->
+
+</robot>

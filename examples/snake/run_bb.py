@@ -79,7 +79,7 @@ snake_yaml_2 = os.path.join(os.path.dirname(__file__), "definitions", "snake_dis
 arm_manipulator_def = SMManipulatorDefinition.from_file(snake_yaml)
 
 # create the arm manipulator...
-arm = SMContinuumManipulator(arm_manipulator_def)
+arm = SMContinuumManipulator(arm_manipulator_def, testFlag=1)
 # ... and load it
 startPos = [0, 0, 0]
 startOr = p.getQuaternionFromEuler([-np.pi/2, 0, -np.pi/2])
@@ -108,7 +108,6 @@ contact_properties = {
 }
 
 arm.set_contact_property(contact_properties)
-
 # Use linkIndex to specify the link you want to change the contact properties of
 contact_properties = {
     "lateralFriction": 1,
@@ -117,7 +116,7 @@ contact_properties = {
     'restitution': 3.0, # uncomment to change restitution
 }
 
-arm.set_contact_property_for_link(contact_properties, linkIndex=1)
+arm.set_contact_property_for_link(contact_properties, linkIndex=1, linkNum=16)
 
 # anistropicFriction = [1, 0.01, 0.01]
 # p.changeDynamics(sphereUid, -1, lateralFriction=1.39, anisotropicFriction=anistropicFriction)
@@ -145,7 +144,7 @@ if VIDEO_LOGGING:
 
 p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)  # enable rendering again
 
-for i in range(n_steps):
+for i in range(n_steps * 10):
 
     torques = actuation_fn(
         i * time_step

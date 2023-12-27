@@ -67,6 +67,7 @@ class SMContinuumManipulator:
     def __init__(
         self,
         manipulator_definition: Union[SMManipulatorDefinition, Dict, str],
+        testFlag = 0
     ):
 
         # assert that all arguments are of the right type.
@@ -83,9 +84,15 @@ class SMContinuumManipulator:
         self.manipulator_definition = manipulator_definition
 
         # create the urdf
-        self.manipulator_definition.urdf_filename = create_manipulator_urdf(
-            self.manipulator_definition
-        )
+        # Name your testing .urdf file plus "1", for ex, "bb_snake.urdf" file as "bb_snake1.urdf"
+        if testFlag:
+            self.manipulator_definition.urdf_filename = create_manipulator_urdf(
+                self.manipulator_definition
+            )[:-5] + "1.urdf"
+        else:
+            self.manipulator_definition.urdf_filename = create_manipulator_urdf(
+                self.manipulator_definition
+            )
 
         # turn of velocity_control
 
@@ -481,16 +488,16 @@ class SMContinuumManipulator:
                 **property_dict,
             )
 
-    def set_contact_property_for_link(self, property_dict, link_index: int, linkNum = 1):
+    def set_contact_property_for_link(self, property_dict, linkIndex: int, linkNum = 1):
         # todo: assert that dict only has valid keys
         # todo: assert the link_index is valid
         for _ in range(linkNum):
             p.changeDynamics(
                 self.bodyUniqueId,
-                link_index,
+                linkIndex,
                 **property_dict,
             )
-            link_index += 1
+            linkIndex += 1
 
     def get_backbone_position(self, s):
 
