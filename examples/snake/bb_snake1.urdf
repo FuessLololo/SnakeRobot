@@ -49,7 +49,7 @@
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
   </link>
-  <joint name="act0Seg0_to_act0Seg1_ax0" type="revolute">
+  <joint name="act0Seg0_to_act0Seg1_ax0" type="fixed">
     <parent link="act0Seg0" />
     <child link="act0Seg1" />
     <origin xyz="0 0 0.05" rpy="0 0 0" />
@@ -159,6 +159,13 @@
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
   </link>
+  <joint name="act0Seg0_to_act1Seg0" type="fixed">
+    <parent link="act0Seg0" />
+    <child link="act1Seg0" />
+    <origin xyz="0 0 0.05" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="100" velocity="3" />
+  </joint>
   <joint name="act0Seg1_to_act1Seg1_ax1" type="fixed">
     <parent link="act0Seg1" />
     <child link="act1Seg1" />
@@ -297,6 +304,13 @@
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
   </link>
+  <joint name="act1Seg0_to_act2Seg0" type="fixed">
+    <parent link="act1Seg0" />
+    <child link="act2Seg0" />
+    <origin xyz="0 0 0.05" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="100" velocity="3" />
+  </joint>
   <joint name="act1Seg1_to_act2Seg1_ax1" type="fixed">
     <parent link="act1Seg1" />
     <child link="act2Seg1" />
@@ -414,7 +428,7 @@
     <origin xyz="0 0 0.1" rpy="0 0 0" />
     <axis xyz="1 0 0" />
   </joint>
-    <link name="act3Seg0">
+  <link name="act3Seg0">
     <visual>
       <origin xyz="0 0 0.025" rpy="0 0 0" />
       <geometry>
@@ -435,6 +449,13 @@
       <inertia ixx="1" ixy="0" ixz="0" iyy="1" iyz="0" izz="1" />
     </inertial>
   </link>
+  <joint name="act2Seg0_to_act3Seg0" type="fixed">
+    <parent link="act2Seg0" />
+    <child link="act3Seg0" />
+    <origin xyz="0 0 0.05" rpy="0 0 0" />
+    <axis xyz="1 0 0" />
+    <limit lower="0" upper="0" effort="100" velocity="3" />
+  </joint>
   <joint name="act2Seg1_to_act3Seg1_ax1" type="fixed">
     <parent link="act2Seg1" />
     <child link="act3Seg1" />

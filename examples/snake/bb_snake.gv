@@ -1,0 +1,119 @@
+digraph G {
+node [shape=box];
+"base_link" [label="base_link"];
+"act1Seg0" [label="act1Seg0"];
+"act1Seg1" [label="act1Seg1"];
+"act1Seg2" [label="act1Seg2"];
+"act1Seg2helper_shape" [label="act1Seg2helper_shape"];
+"act2Seg1" [label="act2Seg1"];
+"act2Seg2" [label="act2Seg2"];
+"act2Seg2helper_shape" [label="act2Seg2helper_shape"];
+"act3Seg1" [label="act3Seg1"];
+"act3Seg2" [label="act3Seg2"];
+"act3Seg2helper_shape" [label="act3Seg2helper_shape"];
+"act1Seg1helper_shape" [label="act1Seg1helper_shape"];
+"act2Seg0" [label="act2Seg0"];
+"act2Seg1" [label="act2Seg1"];
+"act2Seg2" [label="act2Seg2"];
+"act2Seg2helper_shape" [label="act2Seg2helper_shape"];
+"act3Seg1" [label="act3Seg1"];
+"act3Seg2" [label="act3Seg2"];
+"act3Seg2helper_shape" [label="act3Seg2helper_shape"];
+"act2Seg1helper_shape" [label="act2Seg1helper_shape"];
+"act3Seg0" [label="act3Seg0"];
+"act3Seg1" [label="act3Seg1"];
+"act3Seg2" [label="act3Seg2"];
+"act3Seg2helper_shape" [label="act3Seg2helper_shape"];
+"act3Seg1helper_shape" [label="act3Seg1helper_shape"];
+"act0Seg0" [label="act0Seg0"];
+"act0Seg1" [label="act0Seg1"];
+"act0Seg2" [label="act0Seg2"];
+"act0Seg2helper_shape" [label="act0Seg2helper_shape"];
+"act1Seg1" [label="act1Seg1"];
+"act1Seg2" [label="act1Seg2"];
+"act1Seg2helper_shape" [label="act1Seg2helper_shape"];
+"act2Seg1" [label="act2Seg1"];
+"act2Seg2" [label="act2Seg2"];
+"act2Seg2helper_shape" [label="act2Seg2helper_shape"];
+"act3Seg1" [label="act3Seg1"];
+"act3Seg2" [label="act3Seg2"];
+"act3Seg2helper_shape" [label="act3Seg2helper_shape"];
+"act0Seg1helper_shape" [label="act0Seg1helper_shape"];
+node [shape=ellipse, color=blue, fontcolor=blue];
+"base_link" -> "act0Seg0_to_act1Seg0" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"act0Seg0_to_act1Seg0" -> "act1Seg0"
+"act1Seg0" -> "act1Seg0_to_act1Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act1Seg0_to_act1Seg1_ax0" -> "act1Seg1"
+"act1Seg1" -> "act1Seg1_to_act1Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act1Seg1_to_act1Seg2_ax1" -> "act1Seg2"
+"act1Seg1" -> "act1Seg1_to_act1Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act1Seg1_to_act1Seg2_ax1helper_shape" -> "act1Seg2helper_shape"
+"act1Seg1" -> "act2Seg0_to_act2Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act2Seg0_to_act2Seg1_ax0" -> "act2Seg1"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1" -> "act2Seg2"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1helper_shape" -> "act2Seg2helper_shape"
+"act2Seg1" -> "act3Seg0_to_act3Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act3Seg0_to_act3Seg1_ax0" -> "act3Seg1"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1" -> "act3Seg2"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1helper_shape" -> "act3Seg2helper_shape"
+"act1Seg0" -> "act1Seg0_to_act1Seg1_ax0helper_shape" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act1Seg0_to_act1Seg1_ax0helper_shape" -> "act1Seg1helper_shape"
+"base_link" -> "act1Seg0_to_act2Seg0" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act1Seg0_to_act2Seg0" -> "act2Seg0"
+"act2Seg0" -> "act2Seg0_to_act2Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act2Seg0_to_act2Seg1_ax0" -> "act2Seg1"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1" -> "act2Seg2"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1helper_shape" -> "act2Seg2helper_shape"
+"act2Seg1" -> "act3Seg0_to_act3Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act3Seg0_to_act3Seg1_ax0" -> "act3Seg1"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1" -> "act3Seg2"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1helper_shape" -> "act3Seg2helper_shape"
+"act2Seg0" -> "act2Seg0_to_act2Seg1_ax0helper_shape" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act2Seg0_to_act2Seg1_ax0helper_shape" -> "act2Seg1helper_shape"
+"base_link" -> "act2Seg0_to_act3Seg0" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"act2Seg0_to_act3Seg0" -> "act3Seg0"
+"act3Seg0" -> "act3Seg0_to_act3Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act3Seg0_to_act3Seg1_ax0" -> "act3Seg1"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1" -> "act3Seg2"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1helper_shape" -> "act3Seg2helper_shape"
+"act3Seg0" -> "act3Seg0_to_act3Seg1_ax0helper_shape" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act3Seg0_to_act3Seg1_ax0helper_shape" -> "act3Seg1helper_shape"
+"base_link" -> "base_link_to_act0Seg0" [label="xyz: 0 0 0 \nrpy: 0 -0 0"]
+"base_link_to_act0Seg0" -> "act0Seg0"
+"act0Seg0" -> "act0Seg0_to_act0Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act0Seg0_to_act0Seg1_ax0" -> "act0Seg1"
+"act0Seg1" -> "act0Seg1_to_act0Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act0Seg1_to_act0Seg2_ax1" -> "act0Seg2"
+"act0Seg1" -> "act0Seg1_to_act0Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act0Seg1_to_act0Seg2_ax1helper_shape" -> "act0Seg2helper_shape"
+"act0Seg1" -> "act1Seg0_to_act1Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act1Seg0_to_act1Seg1_ax0" -> "act1Seg1"
+"act1Seg1" -> "act1Seg1_to_act1Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act1Seg1_to_act1Seg2_ax1" -> "act1Seg2"
+"act1Seg1" -> "act1Seg1_to_act1Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act1Seg1_to_act1Seg2_ax1helper_shape" -> "act1Seg2helper_shape"
+"act1Seg1" -> "act2Seg0_to_act2Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act2Seg0_to_act2Seg1_ax0" -> "act2Seg1"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1" -> "act2Seg2"
+"act2Seg1" -> "act2Seg1_to_act2Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act2Seg1_to_act2Seg2_ax1helper_shape" -> "act2Seg2helper_shape"
+"act2Seg1" -> "act3Seg0_to_act3Seg1_ax0" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act3Seg0_to_act3Seg1_ax0" -> "act3Seg1"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1" -> "act3Seg2"
+"act3Seg1" -> "act3Seg1_to_act3Seg2_ax1helper_shape" [label="xyz: 0 0 0.1 \nrpy: 0 -0 0"]
+"act3Seg1_to_act3Seg2_ax1helper_shape" -> "act3Seg2helper_shape"
+"act0Seg0" -> "act0Seg0_to_act0Seg1_ax0helper_shape" [label="xyz: 0 0 0.05 \nrpy: 0 -0 0"]
+"act0Seg0_to_act0Seg1_ax0helper_shape" -> "act0Seg1helper_shape"
+}
