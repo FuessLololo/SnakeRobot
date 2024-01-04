@@ -41,8 +41,11 @@ physicsClient = p.connect(
 
 p.setPhysicsEngineParameter(enableFileCaching=0)
 
+# This two lines are unnecessary since the simulation is reset before each run
+"""
 plane = p.createCollisionShape(p.GEOM_PLANE)
 p.createMultiBody(0, plane)
+"""
 
 p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)  # disable rendering while loading objects
 p.configureDebugVisualizer(p.COV_ENABLE_GUI, 0) #Enable GUI widgets
@@ -72,17 +75,19 @@ n_steps = 20000
 
 ### load all the objects into the environment
 
-p.changeDynamics(plane, -1, lateralFriction=1)  # set ground plane friction
+# set ground plane friction, unnecessary because of the reset
+""" p.changeDynamics(plane, -1, lateralFriction=1)""" 
 
 snake_yaml = os.path.join(os.path.dirname(__file__), "definitions", "bb_snake.yaml")
 snake_yaml_2 = os.path.join(os.path.dirname(__file__), "definitions", "snake_discrete.yaml")
 arm_manipulator_def = SMManipulatorDefinition.from_file(snake_yaml)
 
 # create the arm manipulator...
-arm = SMContinuumManipulator(arm_manipulator_def, testFlag=1)
-# ... and load it
+arm = SMContinuumManipulator(arm_manipulator_def, testFlag=0)
+# ... and load it, most are unnecssary due to the reset
 startPos = [0, 0, 0]
 startOr = p.getQuaternionFromEuler([-np.pi/2, 0, -np.pi/2])
+
 arm.load_to_pybullet(
     baseStartPos=startPos,
     baseStartOrn=startOr,
@@ -95,35 +100,31 @@ arm.load_to_pybullet(
 
 # get the link index of the manipulator. In somo, the robot_id is called bodyUniqueId
 jointsCount = p.getNumJoints(arm.bodyUniqueId)
+linksCount = jointsCount
+simulationCount = pow(2, linksCount)
 for joint_index in range(jointsCount):
     joint_info = p.getJointInfo(arm.bodyUniqueId, joint_index)
     link_name = joint_info[12].decode("utf-8")
     print(f"Link {joint_index}: {link_name}")
 
-contact_properties = {
+
+contact_properties_with_fri = {
     "lateralFriction": 1,
     "anisotropicFriction": [12, 0.01, 0.01],
     "angularDamping": 3,
     'restitution': 3.0, # uncomment to change restitution
 }
 
-arm.set_contact_property(contact_properties)
+# arm.set_contact_property(contact_properties_with_fri)
 # Use linkIndex to specify the link you want to change the contact properties of
-contact_properties = {
+contact_properties_without_fri = {
     "lateralFriction": 1,
     "anisotropicFriction": [0.01, 0.01, 0.01],
     "angularDamping": 3,
     'restitution': 3.0, # uncomment to change restitution
 }
 
-arm.set_contact_property_for_link(contact_properties, linkIndex=1, linkNum=16)
-
-# anistropicFriction = [1, 0.01, 0.01]
-# p.changeDynamics(sphereUid, -1, lateralFriction=1.39, anisotropicFriction=anistropicFriction)
-# p.getNumJoints(sphereUid)
-# for i in range(p.getNumJoints(sphereUid)):
-#   p.getJointInfo(sphereUid, i)
-#   p.changeDynamics(sphereUid, i, lateralFriction=1.39, anisotropicFriction=anistropicFriction)
+# arm.set_contact_property_for_link(contact_properties_without_fri, linkIndex=1, linkNum=0)
 
 ######## PRESCRIBE A TRAJECTORY ########
 # here, the trajectory is hard-coded (booh!) and prepared using the sorotraj format
@@ -142,22 +143,63 @@ if VIDEO_LOGGING:
     vid_filename = "~/vid.mp4"
     logIDvideo = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, vid_filename)
 
-p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1)  # enable rendering again
 
-for i in range(n_steps * 10):
+for curSimulation in range(simulationCount):
+    p.resetSimulation()
 
-    torques = actuation_fn(
-        i * time_step
-    )  # retrieve control torques from the trajectory.
-    # print(f"i = {i}\t{torques}")
-    # applying the control torques
-    arm.apply_actuation_torques(
-        actuator_nrs=[0, 0, 1, 1],
-        axis_nrs=[0, 1, 0, 1],
-        actuation_torques=torques.tolist(),
+    # create the ground plane
+    plane = p.createCollisionShape(p.GEOM_PLANE)
+    p.createMultiBody(0, plane)
+    p.changeDynamics(plane, -1, lateralFriction=1)
+
+    # set physics parameters
+    p.setGravity(0, 0, -9.8)
+    p.setPhysicsEngineParameter(enableConeFriction=1)
+    p.setRealTimeSimulation(0)
+    
+    # reset the robot
+    arm.load_to_pybullet(
+        baseStartPos=startPos,
+        baseStartOrn=startOr,
+        # baseConstraint="static",  # other options are free and constrained, but those are not recommended rn
+        baseConstraint="free",
+        physicsClient=physicsClient,
     )
 
-    p.stepSimulation()
+    # process the friction configuration
+    curSimulationBinary = bin(curSimulation)[2:]
+    curSimulationBinary = curSimulationBinary.zfill(linksCount)
+    for link_index in range(linksCount):
+        if curSimulationBinary[link_index] == '0':
+            arm.set_contact_property_for_link(contact_properties_without_fri, linkIndex=link_index, linkNum=1)
+        else:
+            arm.set_contact_property_for_link(contact_properties_with_fri, linkIndex=link_index, linkNum=1)
+
+    # enable rendering
+    p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1) 
+
+    for i in range(n_steps // 3):
+
+        torques = actuation_fn(
+            i * time_step
+        )  # retrieve control torques from the trajectory.
+        # print(f"i = {i}\t{torques}")
+        # applying the control torques
+        arm.apply_actuation_torques(
+            actuator_nrs=[0, 0, 1, 1],
+            axis_nrs=[0, 1, 0, 1],
+            actuation_torques=torques.tolist(),
+        )
+
+        p.stepSimulation()
+
+    # get the linear velocity of the base
+    linear, angular = p.getBaseVelocity(arm.bodyUniqueId)
+    speed = np.linalg.norm(linear)
+    print(f"linear velocity: {linear}\tspeed: {speed}")
+
+    p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
+
 
 ######## CLEANUP AFTER SIMULATION ########
 # this goes after the run loop
