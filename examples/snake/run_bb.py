@@ -24,7 +24,7 @@ from somo.utils import load_constrained_urdf
 import sorotraj
 
 # select whether you want to record a video or not
-VIDEO_LOGGING = True
+VIDEO_LOGGING = False
 
 ######## SIMULATION SETUP ########
 ### prepare everything for the physics client / rendering
@@ -143,7 +143,15 @@ if VIDEO_LOGGING:
     vid_filename = "~/vid.mp4"
     logIDvideo = p.startStateLogging(p.STATE_LOGGING_VIDEO_MP4, vid_filename)
 
+# create a .csv file to store the configuration and speed.
+# if the file already exists, delete it and create a new one.
+if os.path.exists(f"{os.path.dirname(__file__)}/speeds.csv"):
+        os.remove(f"{os.path.dirname(__file__)}/speeds.csv")
+with open(f"{os.path.dirname(__file__)}/speeds.csv", "w") as f:
+    f.write("Configuration,X-linear Velocity,Y-linear Velocity,Speed,Yaw Rate\n")
 
+# execute the simulation multiple times with different friction configurations
+simulationCount = 6 # This is for testing.....
 for curSimulation in range(simulationCount):
     p.resetSimulation()
 
@@ -193,10 +201,14 @@ for curSimulation in range(simulationCount):
 
         p.stepSimulation()
 
-    # get the linear velocity of the base
+    # get the many kinds of velocity
     linear, angular = p.getBaseVelocity(arm.bodyUniqueId)
     speed = np.linalg.norm(linear)
-    print(f"linear velocity: {linear}\tspeed: {speed}")
+    # print(f"linear velocity: {linear}\tspeed: {speed}\tangular velocity: {angular}")
+
+    # write the configuration binary name with the speed to the .csv file
+    with open(f"{os.path.dirname(__file__)}/speeds.csv", "a") as f:
+        f.write(f"'{curSimulationBinary},{linear[0]},{linear[1]},{speed},{angular[2]}\n")
 
     p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
 
