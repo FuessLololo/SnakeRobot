@@ -151,8 +151,9 @@ with open(f"{os.path.dirname(__file__)}/speeds.csv", "w") as f:
     f.write("Configuration,X-linear Velocity,Y-linear Velocity,Speed,Yaw Rate\n")
 
 # execute the simulation multiple times with different friction configurations
-simulationCount = 6 # This is for testing.....
+simulationCount = 1 # This is for testing.....
 for curSimulation in range(simulationCount):
+    curSimulation = int('0000111110000011', 2) # Test some specific configuration
     p.resetSimulation()
 
     # create the ground plane
@@ -204,12 +205,14 @@ for curSimulation in range(simulationCount):
     # get the many kinds of velocity
     linear, angular = p.getBaseVelocity(arm.bodyUniqueId)
     speed = np.linalg.norm(linear)
-    # print(f"linear velocity: {linear}\tspeed: {speed}\tangular velocity: {angular}")
+    print(f"linear velocity: {linear}\tspeed: {speed}\tangular velocity: {angular}")
 
     # write the configuration binary name with the speed to the .csv file
+    # if you want to save the data to a .csv file, uncomment the following lines
+    '''
     with open(f"{os.path.dirname(__file__)}/speeds.csv", "a") as f:
         f.write(f"'{curSimulationBinary},{linear[0]},{linear[1]},{speed},{angular[2]}\n")
-
+    '''
     p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
 
 
