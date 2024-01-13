@@ -2,6 +2,7 @@ import pybullet as p
 import pybullet_data
 
 import numpy as np
+import pandas as pd
 
 import math
 
@@ -212,6 +213,16 @@ for curSimulation in range(simulationCount):
     linear, angular = p.getBaseVelocity(arm.bodyUniqueId)
     speed = np.linalg.norm(linear)
     print(f"linear velocity: {linear}\tspeed: {speed}\tangular velocity: {angular}")
+
+    # get the similar friction configurations and its speed
+    # comment this when the simulationCount gets large.
+    similar_friction_configurations = arm.get_similar_friction_configurations(curSimulationBinary)
+    target_item = []
+    for e in similar_friction_configurations:
+        target_item.append("'" + e)
+    df = pd.read_csv(f"{os.path.dirname(__file__)}/TrajectoryData/speed_16.csv")
+    for e in target_item:
+        print(f"speed of {e}: {df[df['Configuration'] == e]['Speed'].values[0]}")
 
     # write the configuration binary name with the speed to the .csv file
     # if you want to save the data to a .csv file, uncomment the following lines

@@ -555,6 +555,15 @@ class SMContinuumManipulator:
         link_pos = linkState[0]
 
         return link_pos
+    
+    def get_similar_friction_configurations(self, friction_configuration):
+        """returns a list of binary friction configurations that are similar to the one provided"""
+        similar_configurations = []
+        digit = len(friction_configuration)
+        for i in range(digit):
+            friction_configuration_flip = friction_configuration[0:i] + str(1 - int(friction_configuration[i])) + friction_configuration[i+1:]
+            similar_configurations.append(friction_configuration_flip)
+        return similar_configurations
 
     # lists all link positions; todo: make sure this does not return the positions of helper shapes
     def get_backbone_positions(self):
