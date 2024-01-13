@@ -151,6 +151,7 @@ with open(f"{os.path.dirname(__file__)}/speeds.csv", "w") as f:
     f.write("Configuration,X-linear Velocity,Y-linear Velocity,Speed,Yaw Rate\n")
 
 # execute the simulation multiple times with different friction configurations
+arm.delete_position_file()
 simulationCount = 1 # This is for testing.....
 for curSimulation in range(simulationCount):
     curSimulation = int('0000111110000011', 2) # Test some specific configuration
@@ -186,8 +187,13 @@ for curSimulation in range(simulationCount):
 
     # enable rendering
     p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 1) 
+    
+    TrajectoryData = []
 
     for i in range(n_steps // 3):
+
+        pos, orn = p.getBasePositionAndOrientation(arm.bodyUniqueId)
+        TrajectoryData.append([pos, orn])
 
         torques = actuation_fn(
             i * time_step
@@ -213,6 +219,11 @@ for curSimulation in range(simulationCount):
     with open(f"{os.path.dirname(__file__)}/speeds.csv", "a") as f:
         f.write(f"'{curSimulationBinary},{linear[0]},{linear[1]},{speed},{angular[2]}\n")
     '''
+
+    # save the trajectory data to a .txt file or a .png file
+    arm.save_position_as_csv(TrajectoryData, suffix=str(curSimulationBinary))
+    arm.save_position_as_png(TrajectoryData, suffix=str(curSimulationBinary))
+
     p.configureDebugVisualizer(p.COV_ENABLE_RENDERING, 0)
 
 

@@ -5,6 +5,9 @@ from somo.create_manipulator_urdf import create_manipulator_urdf
 
 import pybullet as p
 import numpy as np
+import matplotlib.pyplot as plt
+from os import path, remove, mkdir, listdir
+from inspect import stack
 
 # from somo.utils import stdout_redirected
 import io
@@ -498,6 +501,45 @@ class SMContinuumManipulator:
                 **property_dict,
             )
             linkIndex += 1
+
+    def delete_position_file(self):
+        main_program_dir = path.dirname(stack()[-1][1])
+        if not path.exists(path.join(main_program_dir, "TrajectoryData")):
+            mkdir(path.join(main_program_dir, "TrajectoryData"))
+        savedata_dir = path.join(main_program_dir, "TrajectoryData")
+        for file in listdir(savedata_dir):
+            if "TrajectoryData" in file:
+                remove(path.join(savedata_dir, file))
+
+    def save_position_as_csv(self, TrajectoryData, suffix = ""):
+        savedata_dir = self.position_file()
+        if not path.exists(path.join(savedata_dir, f"TrajectoryData{suffix}.csv")):
+            with open(path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "w") as f:
+                f.write("pos_x,pos_y,pos_z,orn_x,orn_y,orn_z,orn_w\n")
+        with open(path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "a") as f:
+            for pos, orn in TrajectoryData:
+                f.write(f"{pos[0]},{pos[1]},{pos[2]},{orn[0]},{orn[1]},{orn[2]},{orn[3]}\n")
+
+    def position_file(self, suffix = ""):
+        main_program_dir = path.dirname(stack()[-1][1])
+        savedata_dir = path.join(main_program_dir, "TrajectoryData")
+        return savedata_dir
+
+    def save_position_as_png(self, TrajectoryData, suffix = ""):
+        x_positions = []
+        y_positions = []
+        for e in TrajectoryData:
+            x_positions.append(e[0][0])
+            y_positions.append(e[0][1])
+
+        plt.plot(x_positions, y_positions, label="Robot Trajectory")
+        plt.xlabel("X Position")
+        plt.ylabel("Y Position")
+        plt.title("Robot Trajectory")
+        plt.legend()
+        plt.grid(True)
+        plt.savefig(path.join(self.position_file(), f"TrajectoryData{suffix}.png"))
+        plt.show()
 
     def get_backbone_position(self, s):
 
