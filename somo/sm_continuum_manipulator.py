@@ -6,7 +6,9 @@ from somo.create_manipulator_urdf import create_manipulator_urdf
 import pybullet as p
 import numpy as np
 import matplotlib.pyplot as plt
-from os import path, remove, mkdir, listdir
+import pandas as pd
+import os
+from math import cos, sin
 from inspect import stack
 
 # from somo.utils import stdout_redirected
@@ -502,27 +504,37 @@ class SMContinuumManipulator:
             )
             linkIndex += 1
 
-    def delete_position_file(self):
-        main_program_dir = path.dirname(stack()[-1][1])
-        if not path.exists(path.join(main_program_dir, "TrajectoryData")):
-            mkdir(path.join(main_program_dir, "TrajectoryData"))
-        savedata_dir = path.join(main_program_dir, "TrajectoryData")
-        for file in listdir(savedata_dir):
-            if "TrajectoryData" in file:
-                remove(path.join(savedata_dir, file))
+    def set_friction_vector_for_link(self, magnitude, angle, linkIndex: int, linkNum = 1):
+        anisotropicFriction = [magnitude * cos(angle * 3.1416 / 180), magnitude * sin(angle * 3.1416 / 180), 0.01]
+        for _ in range(linkNum):
+            p.changeDynamics(
+                self.bodyUniqueId,
+                linkIndex,
+                lateralFriction=anisotropicFriction,
+            )
+            linkIndex += 1
+
+    def delete_position_files(self, curSimulationBinary = None):
+        main_program_dir = os.path.dirname(stack()[-1][1])
+        if not os.path.exists(os.path.join(main_program_dir, "TrajectoryData")):
+            os.mkdir(os.path.join(main_program_dir, "TrajectoryData"))
+        savedata_dir = os.path.join(main_program_dir, "TrajectoryData")
+        for file in os.listdir(savedata_dir):
+            if curSimulationBinary in file:
+                os.remove(os.path.join(savedata_dir, file))
 
     def save_position_as_csv(self, TrajectoryData, suffix = ""):
         savedata_dir = self.position_file()
-        if not path.exists(path.join(savedata_dir, f"TrajectoryData{suffix}.csv")):
-            with open(path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "w") as f:
+        if not os.path.exists(os.path.join(savedata_dir, f"TrajectoryData{suffix}.csv")):
+            with open(os.path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "w") as f:
                 f.write("pos_x,pos_y,pos_z,orn_x,orn_y,orn_z,orn_w\n")
-        with open(path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "a") as f:
+        with open(os.path.join(savedata_dir, f"TrajectoryData{suffix}.csv"), "a") as f:
             for pos, orn in TrajectoryData:
                 f.write(f"{pos[0]},{pos[1]},{pos[2]},{orn[0]},{orn[1]},{orn[2]},{orn[3]}\n")
 
-    def position_file(self, suffix = ""):
-        main_program_dir = path.dirname(stack()[-1][1])
-        savedata_dir = path.join(main_program_dir, "TrajectoryData")
+    def position_file(self):
+        main_program_dir = os.path.dirname(stack()[-1][1])
+        savedata_dir = os.path.join(main_program_dir, "TrajectoryData")
         return savedata_dir
 
     def save_position_as_png(self, TrajectoryData, suffix = ""):
@@ -533,12 +545,12 @@ class SMContinuumManipulator:
             y_positions.append(e[0][1])
 
         plt.plot(x_positions, y_positions, label="Robot Trajectory")
-        plt.xlabel("X Position")
-        plt.ylabel("Y Position")
+        plt.xlabel("X Position (m)")
+        plt.ylabel("Y Position (m)")
         plt.title("Robot Trajectory")
         plt.legend()
         plt.grid(True)
-        plt.savefig(path.join(self.position_file(), f"TrajectoryData{suffix}.png"))
+        plt.savefig(os.path.join(self.position_file(), f"TrajectoryData{suffix}.png"))
         plt.show()
 
     def get_backbone_position(self, s):
@@ -564,6 +576,17 @@ class SMContinuumManipulator:
             friction_configuration_flip = friction_configuration[0:i] + str(1 - int(friction_configuration[i])) + friction_configuration[i+1:]
             similar_configurations.append(friction_configuration_flip)
         return similar_configurations
+    
+    def print_similar_friction_configurations(self, friction_configuration):
+        """prints a list of binary friction configurations that are similar to the one provided"""
+        similar_configurations = self.get_similar_friction_configurations(friction_configuration)
+        target_item = []
+        for e in similar_configurations:
+            target_item.append("'" + e)
+        csv_dir = os.path.dirname(stack()[-1][1])
+        df = pd.read_csv(f"{csv_dir}/TrajectoryData/speed_16.csv")
+        for e in target_item:
+            print(f"speed of {e}: {df[df['Configuration'] == e]['Speed'].values[0]}")
 
     # lists all link positions; todo: make sure this does not return the positions of helper shapes
     def get_backbone_positions(self):
