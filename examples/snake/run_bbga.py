@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 
 import os, time
-from multiprocessing import Process
+import multiprocessing
 
 path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..")
@@ -14,6 +14,8 @@ path = os.path.abspath(
 
 from somo.sm_manipulator_definition import SMManipulatorDefinition
 from somo.sm_continuum_manipulator import SMContinuumManipulator
+
+import rand_snake_friction as rsf
 
 from somo.utils import load_constrained_urdf
 
@@ -68,6 +70,7 @@ actuation_function = acquire_actuation("trajectory.yaml")
 
 def runSimulation(
         arm : SMContinuumManipulator,
+        identifier : int,
         frictionConfigurations,
         actuation_fn,
         DebugVisualizerCamera = None,
@@ -126,9 +129,7 @@ def runSimulation(
         link_name = joint_info[12].decode("utf-8")
 
     for link in range(linksCount):
-        arm.set_contact_property_for_link(frictionConfigurations, linkIndex=link, linkNum=1)
-
-    
+        arm.set_contact_property_for_link(frictionConfigurations[link], linkIndex=link, linkNum=1)
 
     # create the ground plane
     plane = p.createCollisionShape(p.GEOM_PLANE)
@@ -169,26 +170,39 @@ def runSimulation(
     ######## CLEANUP AFTER SIMULATION ########
     p.disconnect()
 
-start = time.time()
+    return [identifier, linear]
+
+snakeList = []
 for i in range(50):
-    runSimulation(arm = arm,
-                frictionConfigurations = contact_properties_with_fri,
-                trajectory_loop = actuation_function,
-                )
-end = time.time()
-print(f"single processing runtime: {end - start}")
+    snakeList.append(rsf.FrictionalSnake(16, 12, 0.95, 0.01, 0.05))
 
-start = time.time()
-processArray = {}
-for pid in range(50):
-    processArray[pid] = Process(target=runSimulation, args=(arm, contact_properties_with_fri, actuation_function))
-    processArray[pid].start()
+parentSnakes = rsf.FrictionalSnakeGroup(snakeList)
 
-for pid in range(50):
-    processArray[pid].join()
-end = time.time()
-print(f"multi processing runtime: {end - start}")
+unchanged_max = 0
 
-# Generate ramdom friction configurations in binary code, in the range of 0 to 90 for each link
+while True: # replace this with a termination condition
 
+    # Group Breed
+    childSnakes = parentSnakes.linkCrossover()
+    childSnakes.mutate()
+    snakeGroup = childSnakes + parentSnakes
+    
+    # Execute Simulation, Return the index and the velocity of each snake
+    if __name__ == "__main__":
+        with multiprocessing.Pool(processes=snakeGroup.snakeNum) as pool:
+            tmpResults = []
+            results = []
+            for snake in snakeGroup.frictionalSnakes:
+                tmpResults.append(pool.apply_async(runSimulation, (arm, snakeGroup.frictionalSnakes.index(snake), snake.frictionConcigurations, actuation_function, DebugVisualizerCamera, "DIRECT", "")))
+            
+            for result in tmpResults:
+                results.append(result.get())
+            
+            pool.close()
+            pool.join()
 
+    # After simulation velocity info is known, set the velocities for snake group
+    snakeGroup.setVelocities(results)
+
+    # Filter out slow snakes
+    parentSnakes = snakeGroup.filterSlowSnakes()

@@ -5,7 +5,7 @@ import os
 x_data = []
 y_data = []
 
-for affix in range(13, 17):
+for affix in range(1, 17):
     if affix < 10:
         affix_ = '0' + str(affix)
     else:
