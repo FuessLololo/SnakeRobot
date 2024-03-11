@@ -180,7 +180,11 @@ parentSnakes = rsf.FrictionalSnakeGroup(snakeList)
 
 unchanged_max = 0
 
-while True: # replace this with a termination condition
+max_speed = 0
+
+
+
+while unchanged_max < 50: # replace this with a termination condition
 
     # Group Breed
     childSnakes = parentSnakes.linkCrossover()
@@ -188,21 +192,32 @@ while True: # replace this with a termination condition
     snakeGroup = childSnakes + parentSnakes
     
     # Execute Simulation, Return the index and the velocity of each snake
+    tmpResults = []
+    results = []
+
     if __name__ == "__main__":
         with multiprocessing.Pool(processes=snakeGroup.snakeNum) as pool:
-            tmpResults = []
-            results = []
             for snake in snakeGroup.frictionalSnakes:
                 tmpResults.append(pool.apply_async(runSimulation, (arm, snakeGroup.frictionalSnakes.index(snake), snake.frictionConcigurations, actuation_function, DebugVisualizerCamera, "DIRECT", "")))
             
-            for result in tmpResults:
-                results.append(result.get())
-            
             pool.close()
             pool.join()
+    
+    for result in tmpResults:
+        results.append(result.get())
 
     # After simulation velocity info is known, set the velocities for snake group
     snakeGroup.setVelocities(results)
 
     # Filter out slow snakes
     parentSnakes = snakeGroup.filterSlowSnakes()
+
+    for res in results:
+        if res[1] > max_speed:
+            max_speed = res[1]
+            unchanged_max = 0
+        else:
+            unchanged_max += 1
+
+
+print(f"max speed: {max_speed}")
